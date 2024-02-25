@@ -1,0 +1,20 @@
+[font]
+size = 13.0
+
+[font.normal]
+family = "Hack Nerd Font"
+style = "Regular"
+
+[[keyboard.bindings]]
+chars = "\u001Bf"
+key = "Right"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bb"
+key = "Left"
+mods = "Alt"
+
+[shell]
+args = ["-l", "-c", "tmux attach || tmux"]
+program = "/bin/bash"
