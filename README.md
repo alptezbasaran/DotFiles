@@ -9,7 +9,6 @@ Dotfiles are stored in tidy sub-folders inside the repository for easy syncing a
 
 | Tool | Ubuntu / Debian | macOS (Homebrew) | Notes |
 |------|-----------------|------------------|-------|
-| **Bash ≥ 4** | `sudo apt install bash` (already Bash 5+ on recent Ubuntu) | `brew install bash` | Apple ships Bash 3.2 — run the script via the Homebrew path:<br>`/opt/homebrew/bin/bash manage_dotfiles.sh …` |
 | **coreutils** (`cp`, `mkdir`, `uname`, etc.) | pre-installed | pre-installed | Used for copying and directory creation |
 | **git** *(optional but recommended)* | `sudo apt install git` | `brew install git` | For version-controlling your dotfiles repo |
 
