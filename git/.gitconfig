@@ -1,0 +1,8 @@
+[user]
+	email = alptezbasaran@gmail.com
+	name = alp
+	signingKey = 09224989D2DE2DB46C142938BC7F7E90DD6B8CAD
+[core]
+	autocrlf = input
+[commit]
+	gpgSign = true
