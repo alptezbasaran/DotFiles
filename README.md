@@ -1,7 +1,29 @@
 # Dotfiles Retriever & Restorer
 
-A single Bash script (`manage_dotfiles.sh`) to **retrieve** (back‑up) and **restore** (deploy) your dotfiles on both **macOS** and **Ubuntu/Linux**.
-Dotfiles are stored in tidy sub‑folders inside the repository for easy syncing and version‑control.
+Portable dot-files powered by two scripts:
+
+* `manage_dotfiles.sh` – retrieve (copy → repo), restore (copy ← repo) **or link** (symlink) dotfiles.
+* `bootstrap.sh` – install prerequisite packages (Homebrew / apt) **then link** the dotfiles in one step.
+
+Works pain-free on both **macOS** and **Ubuntu/Linux** using a single `alacritty.toml` and per-OS overrides (`~/.zshrc.d/<os>.zsh`).
+
+---
+
+# 🏁 Quick Start
+
+```bash
+# clone the repo
+git clone https://github.com/<you>/DotFiles.git && cd DotFiles
+
+# one-shot bootstrap (packages + symlinks)
+./bootstrap.sh
+
+# or only create symlinks
+./manage_dotfiles.sh link
+```
+
+Edits to the files in `$HOME` now go straight into Git because they’re symlinks.
+Run `./manage_dotfiles.sh retrieve` if you prefer the copy-back model instead.
 
 ---
 
@@ -57,10 +79,26 @@ chmod +x manage_dotfiles.sh
 # restore configs from repo → $HOME (fresh machine / clean install)
 ./manage_dotfiles.sh restore
 
+# keep live symlinks instead of copies
+./manage_dotfiles.sh link
+
+# fully bootstrap a new machine (packages + symlinks)
+./bootstrap.sh
+
 # print help / usage info
 ./manage_dotfiles.sh help
 ```
 
 ---
 
-Happy dot‑file‑managing! Keep your configs versioned and your machines in sync. 🎉
+Happy dot-file-managing! Keep your configs versioned and your machines in sync. 🎉
+
+---
+
+## 🧑‍💻 Development & CI
+
+* **Pre-commit hooks** – run `pip install pre-commit` once, then `pre-commit install`. Shell scripts are linted with **shellcheck** / **shfmt** automatically.
+* **GitHub Actions** – every push triggers `.github/workflows/lint.yml` which runs the same hooks server-side.
+* **Manual backup** – run `./tag_backup.sh` to commit any unstaged work and tag it `backup-YYYYMMDD-HHMM`.
+
+---

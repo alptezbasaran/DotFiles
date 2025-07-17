@@ -30,16 +30,22 @@ alias zshconfig="nano ~/.zshrc"
 alias reloadzsh="source ~/.zshrc"
 
 # >>> Micromamba/Conda Initialization >>>
-__conda_setup="$('/home/alp/codes/mambaforge/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    [ -f "/home/alp/codes/mambaforge/etc/profile.d/conda.sh" ] && . "/home/alp/codes/mambaforge/etc/profile.d/conda.sh" || export PATH="/home/alp/codes/mambaforge/bin:$PATH"
+if command -v micromamba >/dev/null 2>&1; then
+    # Use micromamba if available (fast, standalone)
+    eval "$(micromamba shell hook --shell zsh)"
+elif command -v conda >/dev/null 2>&1; then
+    # Fall back to Anaconda/Miniconda
+    eval "$(conda shell.zsh hook)"
 fi
-unset __conda_setup
-
-[ -f "/home/alp/codes/mambaforge/etc/profile.d/mamba.sh" ] && . "/home/alp/codes/mambaforge/etc/profile.d/mamba.sh"
 # <<< Conda Initialization <<<
+
+# macOS-specific tweaks ------------------------------------------------------
+
+# Load per-OS overrides if present (~/.zshrc.d/<os>.zsh)
+case "$OSTYPE" in
+  darwin*) [[ -f "$HOME/.zshrc.d/macos.zsh" ]]  && source "$HOME/.zshrc.d/macos.zsh" ;;
+  linux*)  [[ -f "$HOME/.zshrc.d/linux.zsh" ]] && source "$HOME/.zshrc.d/linux.zsh" ;;
+esac
 
 # Intel oneAPI initialization (compilers, MKL, MPI, SYCL)
 [ -f "/opt/intel/oneapi/setvars.sh" ] && source "/opt/intel/oneapi/setvars.sh"

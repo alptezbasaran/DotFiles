@@ -1,91 +1,106 @@
 #!/usr/bin/env bash
-
 # -----------------------------------------------------------------------------
-# manage_dotfiles.sh – retrieve / restore dotfiles across macOS and Linux
+# Dotfiles Retriever & Restorer — cross-platform
 # -----------------------------------------------------------------------------
-# Prerequisites
-#   • Bash ≥ 4 (macOS users: `brew install bash` and invoke via /
-#     opt/homebrew/bin/bash or /usr/local/bin/bash)
-#   • Standard coreutils: cp, mkdir, uname, etc. (already present on Ubuntu/macOS)
+#  • Syncs dotfiles   (retrieve → repo, restore ← repo, link ↔ symlinks)
+#  • Works the same on macOS and Linux — one Alacritty config for all
+#  • Provides an optional symlink mode so edits in $HOME are version-controlled
 # -----------------------------------------------------------------------------
-
 set -euo pipefail
 
-# Ensure required Bash version -------------------------------------------------
-if (( BASH_VERSINFO[0] < 4 )); then
-  echo "❌  This script requires Bash 4 or newer. Upgrade Bash (e.g. 'brew install bash')"
-  echo "    and run: /usr/local/bin/bash $0 [command]" >&2
-  exit 1
-fi
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "${SCRIPT_DIR}"
 
-# Map of dotfiles → repo sub-directory ----------------------------------------
-declare -A DOTFILES=(
-  [".zshrc"]="shell"
-  [".bashrc"]="shell"
-  [".gitconfig"]="git"
-  [".tmux.conf"]="tmux"
-  [".config/alacritty/alacritty.toml"]="alacritty"
-  ["alp.omp.json"]="prompt"
+OS_NAME="$(uname -s)"   # Linux → "Linux", macOS → "Darwin"
+
+# -----------------------------------------------------------------------------
+# Dotfile mapping
+# -----------------------------------------------------------------------------
+
+declare -A DOTFILES_COMMON=(
+  ["shell/.zshrc"]="${HOME}/.zshrc"
+  ["shell/.bashrc"]="${HOME}/.bashrc"
+  ["git/.gitconfig"]="${HOME}/.gitconfig"
+  ["tmux/.tmux.conf"]="${HOME}/.tmux.conf"
+  ["prompt/alp.omp.json"]="${HOME}/alp.omp.json"
+  ["alacritty/alacritty.toml"]="${HOME}/.config/alacritty/alacritty.toml"
+  ["shell/zsh.d/macos.zsh"]="${HOME}/.zshrc.d/macos.zsh"
+  ["shell/zsh.d/linux.zsh"]="${HOME}/.zshrc.d/linux.zsh"
 )
 
-REPO_DIR=$(pwd)
+# Platform-specific arrays left empty because the Alacritty config is now universal
+declare -A DOTFILES_LINUX=()
+declare -A DOTFILES_DARWIN=()
 
-print_help() {
+# Build final map ------------------------------------------------------------
+
+declare -A DOTFILES=()
+for k in "${!DOTFILES_COMMON[@]}"; do DOTFILES[$k]="${DOTFILES_COMMON[$k]}"; done
+if [[ "$OS_NAME" == "Darwin" ]]; then
+  for k in "${!DOTFILES_DARWIN[@]}"; do DOTFILES[$k]="${DOTFILES_DARWIN[$k]}"; done
+else
+  for k in "${!DOTFILES_LINUX[@]}"; do DOTFILES[$k]="${DOTFILES_LINUX[$k]}"; done
+fi
+
+# -----------------------------------------------------------------------------
+print_usage() {
   cat <<EOF
-Usage: ./manage_dotfiles.sh <command>
-
-Commands
-  retrieve   Back up dotfiles from \$HOME ➜ repo (creates sub-folders as needed)
-  restore    Deploy dotfiles from repo ➜ \$HOME (creates parent dirs as needed)
+Usage: $0 <command>
+  retrieve   Copy dotfiles from \$HOME into the repository
+  restore    Copy dotfiles from the repository back into \$HOME
+  link       Create/refresh symlinks from \$HOME to the repo
   help       Show this help message
-
-Prerequisites
-  • Bash 4+  – macOS ships Bash 3.2; install a newer version with Homebrew:
-      brew install bash
-    then run the script with the full path, e.g. /opt/homebrew/bin/bash manage_dotfiles.sh
-  • Coreutils – cp, mkdir, uname (already present on Ubuntu & macOS)
-
-Example
-  ./manage_dotfiles.sh retrieve   # snapshot current configs into repo
-  ./manage_dotfiles.sh restore    # restore configs onto a fresh machine
 EOF
 }
 
-retrieve_dotfiles() {
-  echo "📥 Retrieving dotfiles into repository…"
-  for file in "${!DOTFILES[@]}"; do
-    local src="$HOME/$file"
-    local dst_dir="$REPO_DIR/${DOTFILES[$file]}"
-    mkdir -p "$dst_dir"
-    if [[ -f "$src" ]]; then
-      cp "$src" "$dst_dir/$(basename "$file")"
-      echo "  ✔ $src ➜ $dst_dir"
-    else
-      echo "  ⚠ Missing: $src (skipped)"
-    fi
-  done
-  echo "✅ Retrieval complete."
+copy_file() {
+  local src="$1" dst="$2"
+  mkdir -p "$(dirname "$dst")"
+  cp -av "$src" "$dst"
 }
 
-restore_dotfiles() {
-  echo "📤 Restoring dotfiles to system…"
-  for file in "${!DOTFILES[@]}"; do
-    local src="$REPO_DIR/${DOTFILES[$file]}/$(basename "$file")"
-    local dst="$HOME/$file"
-    mkdir -p "$(dirname "$dst")"
-    if [[ -f "$src" ]]; then
-      cp "$src" "$dst"
-      echo "  ✔ $src ➜ $dst"
-    else
-      echo "  ⚠ Repo copy missing: $src (skipped)"
-    fi
+# -----------------------------------------------------------------------------
+# Symlink helper
+# -----------------------------------------------------------------------------
+create_symlink() {
+  local src="$1" dst="$2"
+  mkdir -p "$(dirname "$dst")"
+  ln -sfn "$src" "$dst"
+}
+
+cmd_retrieve() {
+  echo "🔄  Retrieving dotfiles…"
+  for repo_path in "${!DOTFILES[@]}"; do
+    local src="${DOTFILES[$repo_path]}" dst="$SCRIPT_DIR/$repo_path"
+    [[ -e "$src" ]] && copy_file "$src" "$dst" || echo "(skip) $src not found" >&2
   done
-  echo "✅ Restoration complete."
+  echo "✅  Retrieve done. Commit your changes!"
+}
+
+cmd_restore() {
+  echo "⬇️   Restoring dotfiles…"
+  for repo_path in "${!DOTFILES[@]}"; do
+    local src="$SCRIPT_DIR/$repo_path" dst="${DOTFILES[$repo_path]}"
+    [[ -e "$src" ]] && copy_file "$src" "$dst" || echo "(skip) $src missing" >&2
+  done
+
+  echo "✅  Restore complete. Open a new shell to load configs."
+}
+
+# Symlink deployment ---------------------------------------------------------
+cmd_link() {
+  echo "🔗  Linking dotfiles…"
+  for repo_path in "${!DOTFILES[@]}"; do
+    local src="$SCRIPT_DIR/$repo_path" dst="${DOTFILES[$repo_path]}"
+    [[ -e "$src" ]] && create_symlink "$src" "$dst" || echo "(skip) $src missing" >&2
+  done
+  echo "✅  Symlinks created. Reload your shell."
 }
 
 case "${1:-}" in
-  retrieve) retrieve_dotfiles ;;
-  restore)  restore_dotfiles  ;;
-  help|--help|-h|"") print_help ;;
-  *) echo "Unknown command: $1" >&2; print_help; exit 1 ;;
-esac
+  retrieve) cmd_retrieve ;;
+  restore)  cmd_restore  ;;
+  link)     cmd_link     ;;
+  help|-h|--help|"") print_usage ;;
+  *) echo "Unknown command: $1" >&2; print_usage; exit 1 ;;
+esac 

@@ -1,0 +1,7 @@
+zsh
+tmux
+alacritty
+fzf
+ripgrep
+bat
+stow 

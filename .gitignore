@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Swap / temp files
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Logs
+*.log
+
+# Node modules
+node_modules/
+
+# Byte-code
+__pycache__/
+
+# IDE
+.idea/
+.vscode/
+
+# Virtual environments
+.venv/ 
