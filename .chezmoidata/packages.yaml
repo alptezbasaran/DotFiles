@@ -1,0 +1,17 @@
+# .chezmoidata/packages.yaml
+cli:
+  darwin:
+    brew:
+      - tmux
+      - fd
+      - fzf
+  debian:
+    apt:
+      - tmux
+      - fd-find       # fd's name in Debian/Ubuntu
+      - fzf
+  arch:
+    pacman:
+      - tmux
+      - fd
+      - fzf

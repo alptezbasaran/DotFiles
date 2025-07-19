@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+#
+# run_once_install-oh-my-zsh.sh.tmpl
+#
+# Installs oh-my-zsh exactly once per host.
+#
+
+set -e
+
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "Installing oh-my-zsh…"
+
+  # Don’t launch a new shell; don’t change the user’s login shell; keep existing .zshrc
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+  echo "oh-my-zsh installed 🎉"
+else
+  echo "oh-my-zsh already present – skipping installation."
+fi
