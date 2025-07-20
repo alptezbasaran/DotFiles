@@ -10,7 +10,23 @@ case "{{ .chezmoi.os }}" in
     if [ -f /etc/debian_version ]; then
       echo "Installing apt packages…"
       sudo apt update
-      sudo apt install -y {{ join " " .cli.debian.apt }}
+      # Install apt packages except Alacritty (handled separately via Snap)
+      PACKAGES="$(echo '{{ join " " .cli.debian.apt }}' | tr ' ' '\n' | grep -v '^alacritty$' | xargs)"
+      if [ -n "$PACKAGES" ]; then
+        sudo apt install -y $PACKAGES
+      fi
+
+      # Ensure Alacritty is installed (prefer Snap on Debian/Ubuntu)
+      if ! command -v alacritty >/dev/null 2>&1; then
+        echo "Alacritty not found – installing via Snap…"
+        if ! command -v snap >/dev/null 2>&1; then
+          echo "snapd not detected – installing snapd first…"
+          sudo apt install -y snapd
+        fi
+        sudo snap install alacritty --classic
+      else
+        echo "Alacritty already installed – skipping."
+      fi
     elif [ -f /etc/arch-release ]; then
       echo "Installing pacman packages…"
       sudo pacman -S --needed --noconfirm {{ join " " .cli.arch.pacman }}
