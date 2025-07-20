@@ -1,23 +1,19 @@
 #!/usr/bin/env sh
-#
-# Installs baseline CLI packages whenever packages.yaml changes.
-#
-
 set -e
 
 case "{{ .chezmoi.os }}" in
   darwin)
     echo "Installing brew packages…"
-    brew install {{ join .cli.darwin.brew " " }}
+    brew install {{ join " " .cli.darwin.brew }}
     ;;
   linux)
     if [ -f /etc/debian_version ]; then
       echo "Installing apt packages…"
       sudo apt update
-      sudo apt install -y {{ join .cli.debian.apt " " }}
+      sudo apt install -y {{ join " " .cli.debian.apt }}
     elif [ -f /etc/arch-release ]; then
       echo "Installing pacman packages…"
-      sudo pacman -S --noconfirm --needed {{ join .cli.arch.pacman " " }}
+      sudo pacman -S --needed --noconfirm {{ join " " .cli.arch.pacman }}
     fi
     ;;
 esac

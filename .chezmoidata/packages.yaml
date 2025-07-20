@@ -2,16 +2,22 @@
 cli:
   darwin:
     brew:
+      - zsh
+      - alacritty
       - tmux
       - fd
       - fzf
   debian:
     apt:
+      - zsh
+      - alacritty
       - tmux
       - fd-find       # fd's name in Debian/Ubuntu
       - fzf
   arch:
     pacman:
+      - zsh
+      - alacritty
       - tmux
       - fd
       - fzf
