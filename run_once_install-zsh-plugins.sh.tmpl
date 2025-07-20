@@ -1,0 +1,42 @@
+#!/usr/bin/env sh
+#
+# run_once_install-zsh-plugins.sh.tmpl
+#
+# Installs zsh-autosuggestions and zsh-syntax-highlighting plugins for Oh-My-Zsh.
+#
+
+set -e
+
+echo "Checking and installing zsh plugins..."
+
+# Check if Oh-My-Zsh is installed
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "Oh-My-Zsh is not installed. Please run the oh-my-zsh installation script first."
+  exit 1
+fi
+
+# Function to install a plugin
+install_plugin() {
+  local plugin_name="$1"
+  local plugin_path="$2"
+  local plugin_url="$3"
+  
+  if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/$plugin_path" ]; then
+    echo "Installing $plugin_name..."
+    git clone "$plugin_url" "$HOME/.oh-my-zsh/custom/plugins/$plugin_path"
+    echo "$plugin_name installed successfully"
+  else
+    echo "$plugin_name is already installed"
+  fi
+}
+
+# Install zsh-autosuggestions
+install_plugin "zsh-autosuggestions" "zsh-autosuggestions" \
+  "https://github.com/zsh-users/zsh-autosuggestions.git"
+
+# Install zsh-syntax-highlighting
+install_plugin "zsh-syntax-highlighting" "zsh-syntax-highlighting" \
+  "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+
+echo "Plugin installation complete! 🎉"
+echo "Restart your terminal or run 'source ~/.zshrc' to activate the plugins." 

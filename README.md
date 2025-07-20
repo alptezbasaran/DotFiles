@@ -20,6 +20,13 @@ These configuration files (Z-shell, Tmux, Alacritty …) are managed with [chezm
 
 The script adds chezmoi to `~/.local/bin`; make sure that directory is on your `PATH`.
 
+**Important**: Add `~/.local/bin` to your PATH if it's not already there:
+
+```bash
+# Add to your shell profile (~/.bashrc, ~/.zshrc, etc.)
+export PATH="$HOME/.local/bin:$PATH"
+```
+
 ---
 
 ## 2. First-time bootstrap on a new machine
@@ -34,6 +41,7 @@ chezmoi init git@github.com:<YOUR_USERNAME>/dotfiles.git --apply
 What happens under the hood:
 
 * **`run_once_install-oh-my-zsh.sh.tmpl`** – installs Oh-My-Zsh the very first time only.
+* **`run_once_install-zsh-plugins.sh.tmpl`** – installs zsh-autosuggestions and zsh-syntax-highlighting plugins the very first time only.
 * **`run_once_install-fonts.sh.tmpl`** – installs programming fonts (JetBrains Mono, Fira Code, Hack) the very first time only.
 * **`run_onchange_install-cli.sh.tmpl`** – installs baseline CLI packages listed in `.chezmoidata/packages.yaml` using **brew / apt / pacman** depending on the OS.
 
