@@ -34,6 +34,7 @@ chezmoi init git@github.com:<YOUR_USERNAME>/dotfiles.git --apply
 What happens under the hood:
 
 * **`run_once_install-oh-my-zsh.sh.tmpl`** – installs Oh-My-Zsh the very first time only.
+* **`run_once_install-fonts.sh.tmpl`** – installs programming fonts (JetBrains Mono, Fira Code, Hack) the very first time only.
 * **`run_onchange_install-cli.sh.tmpl`** – installs baseline CLI packages listed in `.chezmoidata/packages.yaml` using **brew / apt / pacman** depending on the OS.
 
 ---

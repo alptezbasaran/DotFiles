@@ -14,6 +14,9 @@ cli:
       - tmux
       - fd-find       # fd's name in Debian/Ubuntu
       - fzf
+      - fonts-hack
+      - fonts-jetbrains-mono
+      - fonts-firacode
   arch:
     pacman:
       - zsh
@@ -21,3 +24,6 @@ cli:
       - tmux
       - fd
       - fzf
+      - ttf-hack-nerd
+      - ttf-jetbrains-mono-nerd
+      - ttf-fira-code-nerd

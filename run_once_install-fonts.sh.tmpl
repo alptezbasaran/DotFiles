@@ -1,0 +1,69 @@
+#!/usr/bin/env sh
+#
+# run_once_install-fonts.sh.tmpl
+#
+# Installs programming fonts exactly once per host.
+#
+
+set -e
+
+# Create fonts directory if it doesn't exist
+mkdir -p "$HOME/.local/share/fonts"
+
+# Function to download and install a font
+install_font() {
+  local font_name="$1"
+  local font_url="$2"
+  local font_file="$3"
+  
+  if [ ! -f "$HOME/.local/share/fonts/$font_file" ]; then
+    echo "Installing $font_name..."
+    curl -fsSL "$font_url" -o "$HOME/.local/share/fonts/$font_file"
+    echo "$font_name installed"
+  else
+    echo "$font_name already present – skipping installation."
+  fi
+}
+
+# Install popular programming fonts
+echo "Installing programming fonts..."
+
+# JetBrains Mono (popular programming font)
+install_font "JetBrains Mono" \
+  "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip" \
+  "JetBrainsMono.zip"
+
+# Fira Code (programming ligatures)
+install_font "Fira Code" \
+  "https://github.com/tonsky/FiraCode/releases/download/6.2/FiraCode.zip" \
+  "FiraCode.zip"
+
+# Hack (clean programming font)
+install_font "Hack" \
+  "https://github.com/source-foundry/Hack/releases/download/v3.003/Hack-v3.003-ttf.zip" \
+  "Hack.zip"
+
+# Extract fonts if they exist
+cd "$HOME/.local/share/fonts"
+for zip_file in *.zip; do
+  if [ -f "$zip_file" ]; then
+    echo "Extracting $zip_file..."
+    unzip -q -o "$zip_file" -d . || true
+    rm -f "$zip_file"
+  fi
+done
+
+# Update font cache
+case "{{ .chezmoi.os }}" in
+  darwin)
+    echo "Updating font cache on macOS..."
+    # macOS doesn't need explicit font cache update
+    ;;
+  linux)
+    echo "Updating font cache on Linux..."
+    fc-cache -f -v "$HOME/.local/share/fonts" || true
+    ;;
+esac
+
+echo "Font installation complete! 🎉"
+echo "You may need to restart your terminal or applications to see the new fonts." 
