@@ -9,7 +9,10 @@ family = "Hack Nerd Font"
 style = "Regular"
 
 # Shell configuration (Zsh with automatic tmux session attach)
-[terminal.shell]
+[terminal]
+osc52  = "OnlyCopy"
+
+[shell]
 program = "zsh"
 args = ["-l", "-c", "tmux attach || tmux"]
 
