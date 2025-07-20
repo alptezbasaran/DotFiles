@@ -32,6 +32,11 @@ export EDITOR="nano"
 alias zshconfig="nano ~/.zshrc"
 alias reloadzsh="source ~/.zshrc"
 
+# Use batcat when bat is unavailable (Debian/Ubuntu package installs `batcat`)
+if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
+  alias bat="batcat"
+fi
+
 # >>> Micromamba/Conda Initialization >>>
 __conda_setup="$('/home/alp/codes/mambaforge/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
