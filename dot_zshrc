@@ -81,33 +81,20 @@ elif command -v exa >/dev/null 2>&1; then
   alias llg="exa -l --git"
 fi
 
-# Navigation aliases (cd and zoxide)
+# Navigation aliases (simple and safe)
+# alias ..="cd .."
+# alias ...="cd ../.."
+# alias ....="cd ../../.."
+# alias .....="cd ../../../.."
+# alias ~="cd ~"
+# alias -- -="cd -"
+
+# Zoxide utility aliases (if available)
 if command -v zoxide >/dev/null 2>&1; then
-  # Make cd use zoxide for smart directory jumping
   alias cd="z"
-  # Keep traditional cd as a fallback
-  alias cd.="command cd"
-  
-  # Navigation shortcuts using zoxide
-  alias ..="z .."
-  alias ...="z ../.."
-  alias ....="z ../../.."
-  alias .....="z ../../../.."
-  alias ~="z ~"
-  alias -- -="z -"
-  
-  # Zoxide utility aliases (avoid conflicts with zoxide functions)
   alias za="zoxide add"
   alias zr="zoxide remove"
   alias zq="zoxide query"
-else
-  # Fallback to traditional cd if zoxide not available
-  alias ..="cd .."
-  alias ...="cd ../.."
-  alias ....="cd ../../.."
-  alias .....="cd ../../../.."
-  alias ~="cd ~"
-  alias -- -="cd -"
 fi
 
 # Advanced FZF Configuration with fd integration
