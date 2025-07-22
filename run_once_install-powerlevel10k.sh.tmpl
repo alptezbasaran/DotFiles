@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+#
+# run_once_install-powerlevel10k.sh.tmpl
+#
+# Installs Powerlevel10k theme exactly once per host.
+#
+
+set -e
+
+# Check if Powerlevel10k is already installed
+if [ ! -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]; then
+  echo "Installing Powerlevel10k theme…"
+  
+  # Clone Powerlevel10k repository
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+  
+  echo "Powerlevel10k theme installed 🎉"
+  echo "Run 'p10k configure' to customize the theme"
+else
+  echo "Powerlevel10k theme already present – skipping installation."
+fi 

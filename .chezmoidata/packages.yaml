@@ -8,6 +8,8 @@ cli:
       - fd
       - fzf
       - bat
+      - eza
+      - zoxide
   debian:
     apt:
       - zsh
@@ -16,6 +18,7 @@ cli:
       - fd-find       # fd's name in Debian/Ubuntu
       - fzf
       - bat
+      - zoxide
       - fonts-hack
       - fonts-jetbrains-mono
       - fonts-firacode
@@ -27,6 +30,8 @@ cli:
       - fd
       - fzf
       - bat
+      - eza
+      - zoxide
       - ttf-hack-nerd
       - ttf-jetbrains-mono-nerd
       - ttf-fira-code-nerd

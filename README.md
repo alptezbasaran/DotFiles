@@ -33,7 +33,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ```
 # 1. Clone & apply in one step (replace URL with yours)
-chezmoi init git@github.com:<YOUR_USERNAME>/dotfiles.git --apply
+chezmoi init git@github.com:alptezbasaran/DotFiles.git --apply
 
 # 2. Restart your shell or log out/in so that new configs load
 ```

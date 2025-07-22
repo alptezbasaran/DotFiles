@@ -1,0 +1,12 @@
+# OS crap
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+*.swo
+*~ 
+
+# Compiled output
+*.o
+*.pyc

@@ -10,10 +10,58 @@ case "{{ .chezmoi.os }}" in
     if [ -f /etc/debian_version ]; then
       echo "Installing apt packages…"
       sudo apt update
-      # Install apt packages except Alacritty (handled separately via Snap)
-      PACKAGES="$(echo '{{ join " " .cli.debian.apt }}' | tr ' ' '\n' | grep -v '^alacritty$' | xargs)"
+      # Install apt packages except Alacritty and eza (handled separately)
+      PACKAGES="$(echo '{{ join " " .cli.debian.apt }}' | tr ' ' '\n' | grep -v '^alacritty$' | grep -v '^eza$' | xargs)"
       if [ -n "$PACKAGES" ]; then
         sudo apt install -y $PACKAGES
+      fi
+
+      # Install eza (not available in apt repositories)
+      if ! command -v eza >/dev/null 2>&1; then
+        echo "Installing eza (modern ls replacement)…"
+        
+        # Check if we have curl and jq for the installation
+        if ! command -v curl >/dev/null 2>&1; then
+          echo "Installing curl for eza download…"
+          sudo apt install -y curl
+        fi
+        
+        if ! command -v jq >/dev/null 2>&1; then
+          echo "Installing jq for JSON parsing…"
+          sudo apt install -y jq
+        fi
+        
+        # Get the latest release version
+        LATEST_VERSION=$(curl -s https://api.github.com/repos/eza-community/eza/releases/latest | jq -r '.tag_name')
+        
+        # Determine architecture
+        ARCH=$(uname -m)
+        case $ARCH in
+          x86_64) ARCH="x86_64" ;;
+          aarch64) ARCH="aarch64" ;;
+          *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+        esac
+        
+        # Download and install eza
+        DOWNLOAD_URL="https://github.com/eza-community/eza/releases/download/${LATEST_VERSION}/eza_${LATEST_VERSION}_linux_${ARCH}.tar.gz"
+        TEMP_DIR=$(mktemp -d)
+        
+        echo "Downloading eza ${LATEST_VERSION} for ${ARCH}…"
+        curl -L -o "${TEMP_DIR}/eza.tar.gz" "$DOWNLOAD_URL"
+        
+        echo "Extracting eza…"
+        tar -xzf "${TEMP_DIR}/eza.tar.gz" -C "${TEMP_DIR}"
+        
+        echo "Installing eza to /usr/local/bin…"
+        sudo cp "${TEMP_DIR}/eza" /usr/local/bin/
+        sudo chmod +x /usr/local/bin/eza
+        
+        # Clean up
+        rm -rf "${TEMP_DIR}"
+        
+        echo "eza installed successfully! 🎉"
+      else
+        echo "eza already installed – skipping."
       fi
 
       # Ensure Alacritty is installed (prefer Snap on Debian/Ubuntu)
