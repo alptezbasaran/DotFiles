@@ -1,0 +1,20 @@
+[user]
+	email = alptezbasaran@gmail.com
+	name = Alp Tezbasaran
+	signingKey = 09224989D2DE2DB46C142938BC7F7E90DD6B8CAD
+[core]
+	autocrlf = input
+[commit]
+	gpgSign = true
+[alias]
+	at = status -sb
+  	ac = commit -am
+        co = checkout
+        ci = commit
+        lg = log --oneline --graph --decorate --all
+        amend = commit --amend
+        amendne = commit --amend --no-edit
+        cb = rev-parse --abbrev-ref HEAD
+        
+[push]
+	autoSetupRemote = true

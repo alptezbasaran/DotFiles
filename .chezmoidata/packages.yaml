@@ -10,6 +10,8 @@ cli:
       - bat
       - eza
       - zoxide
+      - btop
+      - neovim
   debian:
     apt:
       - zsh
@@ -18,12 +20,14 @@ cli:
       - fd-find       # fd's name in Debian/Ubuntu
       - fzf
       - bat
+      - btop
       - zoxide
       - fonts-hack
       - fonts-jetbrains-mono
       - fonts-firacode
   arch:
     pacman:
+      - btop
       - zsh
       - alacritty
       - tmux
