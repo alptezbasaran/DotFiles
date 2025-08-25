@@ -12,6 +12,7 @@ cli:
       - zoxide
       - btop
       - neovim
+      - git-delta
   debian:
     apt:
       - zsh
@@ -25,6 +26,7 @@ cli:
       - fonts-hack
       - fonts-jetbrains-mono
       - fonts-firacode
+      - git-delta
   arch:
     pacman:
       - btop
