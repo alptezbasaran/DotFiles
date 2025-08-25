@@ -106,7 +106,14 @@ A: Simply execute `chezmoi apply` again; all scripts are *idempotent*.
 
 ---
 
-## 7. Reference commands
+## 7. Documentation
+
+- **[Keyboard Shortcuts Reference](keyboard_shortcuts.md)** – Complete guide to all keyboard shortcuts and aliases
+- **[Zsh Productivity Cheatsheet](zsh_productivity_cheatsheet.md)** – Quick reference for zsh features and workflows
+
+---
+
+## 8. Reference commands
 
 ```
 # Re-apply configs without pulling from remote

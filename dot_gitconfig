@@ -28,6 +28,9 @@
 [delta]
     navigate = true  # use n and N to move between diff sections
     dark = true      # or light = true, or omit for auto-detection
+    side-by-side = true  # enable side-by-side diff view
+    line-numbers = true  # show line numbers
+    syntax-theme = "Monokai Extended"  # syntax highlighting theme
 
 [merge]
     conflictStyle = diff3

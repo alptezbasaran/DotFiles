@@ -1,4 +1,4 @@
-# ~/.zshrc – improved and commented
+# ~/.zshrc
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -44,18 +44,18 @@ fuzzy-rg() {
     return 1
   fi
   
-be  local rg_prefix="rg --column --line-number --no-heading --color=always --smart-case"
   local result
   result=$(
-    $rg_prefix "$query" |
-    fzf --ansi \
-        --delimiter : \
-        --preview 'bat --color=always --highlight-line {2} {1}' \
-        --preview-window '~3,+{2}-10'
+    rg --column --line-number --no-heading --smart-case "$query" |
+    fzf --delimiter : \
+        --preview 'bat {1} --highlight-line {2} 2>/dev/null || cat {1}'
   ) || return
-  local file=$(echo "$result" | cut -d: -f1)
-  local line=$(echo "$result" | cut -d: -f2)
-  ${EDITOR:-nano} +${line} "$file"
+  
+  if [[ -n "$result" ]]; then
+    local file=$(echo "$result" | cut -d: -f1)
+    local line=$(echo "$result" | cut -d: -f2)
+    ${EDITOR:-nano} +${line} "$file"
+  fi
 }
 
 # --- Git grep + fzf (only tracked files) ---
@@ -68,23 +68,40 @@ fuzzy-git-grep() {
   
   local result
   result=$(
-    git grep --line-number --color=always -I "$query" |
-    fzf --ansi \
-        --delimiter : \
-        --preview 'bat --color=always --highlight-line {2} {1}' \
-        --preview-window '~3,+{2}-10'
+    git grep --line-number -I "$query" |
+    fzf --delimiter : \
+        --preview 'bat {1} --highlight-line {2} 2>/dev/null || cat {1}'
   ) || return
-  local file=$(echo "$result" | cut -d: -f1)
-  local line=$(echo "$result" | cut -d: -f2)
-  ${EDITOR:-nano} +${line} "$file"
+  
+  if [[ -n "$result" ]]; then
+    local file=$(echo "$result" | cut -d: -f1)
+    local line=$(echo "$result" | cut -d: -f2)
+    ${EDITOR:-nano} +${line} "$file"
+  fi
 }
 
-# --- Keybindings ---
-# Ctrl+F -> ripgrep search (interactive)
-bindkey -s '^F' 'vared -p "Search with ripgrep: " query; fuzzy-rg "$query"\n'
+# --- ZLE widgets for interactive search ---
+fzf-rg-widget() {
+  zle -I
+  local query
+  vared -p "Search with ripgrep: " query
+  [[ -z "$query" ]] && return
+  fuzzy-rg "$query"
+  zle redisplay
+}
+zle -N fzf-rg-widget
+bindkey '^F' fzf-rg-widget
 
-# Alt+F -> git grep search (interactive)
-bindkey -s '^[f' 'vared -p "Search with git grep: " query; fuzzy-git-grep "$query"\n'
+fzf-git-grep-widget() {
+  zle -I
+  local query
+  vared -p "Search with git grep: " query
+  [[ -z "$query" ]] && return
+  fuzzy-git-grep "$query"
+  zle redisplay
+}
+zle -N fzf-git-grep-widget
+bindkey '^[f' fzf-git-grep-widget
 
 # Zoxide initialization (smart cd replacement)
 if command -v zoxide >/dev/null 2>&1; then
@@ -116,9 +133,9 @@ bindkey '^[[B' history-search-forward
 alias zshconfig="nano ~/.zshrc"
 alias reloadzsh="source ~/.zshrc"
 
-# Search aliases
-alias rg="fuzzy-rg"
-alias gg="fuzzy-git-grep"
+# Search aliases (shortcuts to functions, don’t override rg binary)
+alias frg="fuzzy-rg"
+alias fgg="fuzzy-git-grep"
 
 # Use batcat when bat is unavailable (Debian/Ubuntu package installs `batcat`)
 if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then
@@ -174,7 +191,7 @@ if command -v fzf >/dev/null 2>&1; then
   blue="#06BCE4"
   cyan="#2CF9ED"
   
-  export FZF_DEFAULT_OPTS="--color=fg:${fg},bg:${bg},hl:${purple},fg+:${fg},bg+:${bg_highlight},hl+:${purple},info:${blue},prompt:${cyan},pointer:${cyan},marker:${cyan},spinner:${cyan},header:${cyan}"
+  export FZF_DEFAULT_OPTS="--color=fg:${fg},bg:${bg},hl:${purple},fg+:${fg},bg+:${bg_highlight},hl+:${purple},info:${blue},prompt:${cyan},pointer:${cyan},marker:${cyan},spinner:${cyan},header:${cyan} --bind 'ctrl-j:down,ctrl-k:up,ctrl-n:preview-down,ctrl-p:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up'"
   
   # Use fd instead of find for faster file finding
   if command -v fd >/dev/null 2>&1; then
