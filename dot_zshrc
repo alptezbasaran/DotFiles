@@ -26,6 +26,16 @@ plugins=(
 # Source Oh-My-Zsh
 source $ZSH/oh-my-zsh.sh
 
+# fzf-git integration (extra git-aware pickers for fzf) — load after OMZ
+if [ -f "$HOME/.config/fzf-git/fzf-git.sh" ]; then
+  source "$HOME/.config/fzf-git/fzf-git.sh"
+fi
+
+# forgit: fzf-based git helpers — load after OMZ
+if [ -f "$HOME/.config/forgit/forgit.plugin.zsh" ]; then
+  source "$HOME/.config/forgit/forgit.plugin.zsh"
+fi
+
 # Zoxide initialization (smart cd replacement)
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
@@ -148,7 +158,7 @@ if command -v fzf >/dev/null 2>&1; then
 fi
 
 # >>> Micromamba/Conda Initialization >>>
-__conda_setup="$('/home/alp/codes/mambaforge/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/alp/codes/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
@@ -186,8 +196,9 @@ HIST_STAMPS="yyyy-mm-dd"
 # export LANG=en_US.UTF-8
 
 # Source FZF key bindings and completion (if available)
-[ -f ~/.config/fzf/key-bindings.zsh ] && source ~/.config/fzf/key-bindings.zsh
-[ -f ~/.config/fzf/completion.zsh ]   && source ~/.config/fzf/completion.zsh
+# (Optional) If you keep the OMZ `fzf` plugin, you usually don't need these:
+# [ -f ~/.config/fzf/key-bindings.zsh ] && source ~/.config/fzf/key-bindings.zsh
+# [ -f ~/.config/fzf/completion.zsh ]   && source ~/.config/fzf/completion.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

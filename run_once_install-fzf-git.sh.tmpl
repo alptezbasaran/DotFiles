@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# Installs or updates fzf-git (junegunn/fzf-git.sh) under ~/.config/fzf-git
+
+set -e
+
+DEST="$HOME/.config/fzf-git"
+REPO="https://github.com/junegunn/fzf-git.sh.git"
+
+if [ ! -d "$DEST/.git" ]; then
+  echo "Installing fzf-git…"
+  mkdir -p "$(dirname "$DEST")"
+  git clone "$REPO" "$DEST"
+else
+  echo "fzf-git already present – updating…"
+  git -C "$DEST" pull --ff-only
+fi
+
+# Ensure the main script exists with a predictable name
+if [ -f "$DEST/fzf-git.sh" ]; then
+  echo "fzf-git installed/updated at $DEST"
+else
+  echo "Warning: fzf-git.sh not found in $DEST" >&2
+fi

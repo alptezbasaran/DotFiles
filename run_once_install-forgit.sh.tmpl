@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# Installs or updates forgit (wfxr/forgit) under ~/.config/forgit
+
+set -e
+
+DEST="$HOME/.config/forgit"
+REPO="https://github.com/wfxr/forgit.git"
+
+if [ ! -d "$DEST/.git" ]; then
+  echo "Installing forgit…"
+  mkdir -p "$(dirname "$DEST")"
+  git clone "$REPO" "$DEST"
+else
+  echo "forgit already present – updating…"
+  git -C "$DEST" pull --ff-only
+fi
+
+if [ -f "$DEST/forgit.plugin.zsh" ]; then
+  echo "forgit installed/updated at $DEST"
+else
+  echo "Warning: forgit.plugin.zsh not found in $DEST" >&2
+fi
