@@ -36,6 +36,56 @@ if [ -f "$HOME/.config/forgit/forgit.plugin.zsh" ]; then
   source "$HOME/.config/forgit/forgit.plugin.zsh"
 fi
 
+# --- Ripgrep + fzf content search ---
+fuzzy-rg() {
+  local query="$1"
+  if [[ -z "$query" ]]; then
+    echo "Usage: fuzzy-rg <search-query>"
+    return 1
+  fi
+  
+be  local rg_prefix="rg --column --line-number --no-heading --color=always --smart-case"
+  local result
+  result=$(
+    $rg_prefix "$query" |
+    fzf --ansi \
+        --delimiter : \
+        --preview 'bat --color=always --highlight-line {2} {1}' \
+        --preview-window '~3,+{2}-10'
+  ) || return
+  local file=$(echo "$result" | cut -d: -f1)
+  local line=$(echo "$result" | cut -d: -f2)
+  ${EDITOR:-nano} +${line} "$file"
+}
+
+# --- Git grep + fzf (only tracked files) ---
+fuzzy-git-grep() {
+  local query="$1"
+  if [[ -z "$query" ]]; then
+    echo "Usage: fuzzy-git-grep <search-query>"
+    return 1
+  fi
+  
+  local result
+  result=$(
+    git grep --line-number --color=always -I "$query" |
+    fzf --ansi \
+        --delimiter : \
+        --preview 'bat --color=always --highlight-line {2} {1}' \
+        --preview-window '~3,+{2}-10'
+  ) || return
+  local file=$(echo "$result" | cut -d: -f1)
+  local line=$(echo "$result" | cut -d: -f2)
+  ${EDITOR:-nano} +${line} "$file"
+}
+
+# --- Keybindings ---
+# Ctrl+F -> ripgrep search (interactive)
+bindkey -s '^F' 'vared -p "Search with ripgrep: " query; fuzzy-rg "$query"\n'
+
+# Alt+F -> git grep search (interactive)
+bindkey -s '^[f' 'vared -p "Search with git grep: " query; fuzzy-git-grep "$query"\n'
+
 # Zoxide initialization (smart cd replacement)
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
@@ -65,6 +115,10 @@ bindkey '^[[B' history-search-forward
 # Useful Aliases
 alias zshconfig="nano ~/.zshrc"
 alias reloadzsh="source ~/.zshrc"
+
+# Search aliases
+alias rg="fuzzy-rg"
+alias gg="fuzzy-git-grep"
 
 # Use batcat when bat is unavailable (Debian/Ubuntu package installs `batcat`)
 if command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1; then

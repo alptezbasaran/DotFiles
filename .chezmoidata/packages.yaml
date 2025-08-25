@@ -13,12 +13,13 @@ cli:
       - btop
       - neovim
       - git-delta
+      - ripgrep
   debian:
     apt:
       - zsh
       - alacritty
       - tmux
-      - fd-find       # fd's name in Debian/Ubuntu
+      - fd-find # fd's name in Debian/Ubuntu
       - fzf
       - bat
       - btop
@@ -27,6 +28,7 @@ cli:
       - fonts-jetbrains-mono
       - fonts-firacode
       - git-delta
+      - ripgrep
   arch:
     pacman:
       - btop
@@ -41,3 +43,4 @@ cli:
       - ttf-hack-nerd
       - ttf-jetbrains-mono-nerd
       - ttf-fira-code-nerd
+      - ripgrep
