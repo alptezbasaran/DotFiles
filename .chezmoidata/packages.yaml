@@ -14,6 +14,7 @@ cli:
       - neovim
       - git-delta
       - ripgrep
+      - micromamba
   debian:
     apt:
       - zsh
